@@ -5,4 +5,4 @@ router = APIRouter()
 @router.get("/")
 def list_users():
     print("Listing sales")
-    return [{"name": "Alice"}]
+    return [{"TODO": "ADD more functionality"}]

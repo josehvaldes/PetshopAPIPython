@@ -1,0 +1,6 @@
+FastAPI
+uvicorn
+pydantic
+azure-data-tables
+azure-identity
+pandas
