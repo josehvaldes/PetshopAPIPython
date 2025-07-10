@@ -1,6 +1,7 @@
 FastAPI
 uvicorn
 pydantic
+python-multipart
 azure-data-tables
 azure-identity
 pandas
