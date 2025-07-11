@@ -4,7 +4,7 @@ FROM python:3.12.4-slim
 WORKDIR /petshopapi
 
 # Copy the requirements file
-COPY requirements.txt .
+COPY ./petshopapi/requirements.txt .
 
 # Install the dependencies
 RUN pip install --no-cache-dir -r requirements.txt

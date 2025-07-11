@@ -11,9 +11,12 @@ petshopapiPython
 │   ├── main.py
 │   ├── config.py
 │   ├── logger_config.py
+│   ├── requirements.txt
 │   └── routes
 │       └── item_routes.py
-├── requirements.txt
+│       └── sale_routes.py
+│   └── loaders
+│       └── sale_loader.py
 ├── Dockerfile
 └── README.md
 ```
