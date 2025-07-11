@@ -57,10 +57,6 @@ jobs:
       id-token: write #This is required for requesting the JWT
       contents: read #This is required for actions/checkout
 
-    env:
-      AzureWebJobsStorage__accountName: 'petshopgroup8318'
-      AzureWebJobsStorage__blobServiceUri: 'https://petshopgroup8318.blob.core.windows.net'
-    
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
