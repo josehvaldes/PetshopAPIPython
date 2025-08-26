@@ -1,4 +1,4 @@
-import pandas as pd
+﻿import pandas as pd
 import random
 from faker import Faker
 import datetime
@@ -7,7 +7,7 @@ import datetime
 fake = Faker()
 
 #Generation
-num_records = 1000
+num_records = 10000
 sales_data = []
 
 products_df = pd.read_csv('./input/productsdata.csv')
@@ -40,6 +40,6 @@ for _ in range(num_records):
 
 # Create a DataFrame and save to CSV
 df = pd.DataFrame(sales_data)
-df.to_csv('./salesdata.csv', index=False)
+df.to_csv(f'./salesdata_{num_records}.csv', index=False)
 print ('Sales data generation completed and saved to salesdata.csv')
 print (df.head())
