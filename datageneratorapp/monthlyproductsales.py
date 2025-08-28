@@ -1,7 +1,7 @@
 ﻿import pandas as pd
 import matplotlib.pyplot as plt
 
-sales_df = pd.read_csv('./salesdata_10000.csv', parse_dates=['sale_date'])
+sales_df = pd.read_csv('./data/salesdata_10000.csv', parse_dates=['sale_date'])
 sales_df["month"] = sales_df["sale_date"].dt.to_period("M").astype(str)
 
 monthly_sales = sales_df.groupby(['month', 'product_name'])["total_price"].sum().reset_index()

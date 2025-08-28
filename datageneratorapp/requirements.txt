@@ -3,3 +3,6 @@ Faker
 chromadb
 numpy
 matplotlib
+tensorflow
+tensorflow.keras
+scikit-learn
