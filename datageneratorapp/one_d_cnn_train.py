@@ -3,7 +3,8 @@ import tensorflow as tf
 import numpy as np
 from keras.models import Sequential
 from keras.layers import Conv1D, MaxPooling1D, Flatten, Dense, Dropout
-
+from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
 
 model = Sequential([
     # Convolutional Layer: Learns features from the signal
@@ -32,14 +33,6 @@ model.compile(optimizer='adam',
               loss='sparse_categorical_crossentropy',
               metrics=['accuracy'])
 
-# Print the model summary
-model.summary()
-
-
-# Now you can train the model with your data:
-# model.fit(X_train, y_train, epochs=10, validation_data=(X_test, y_test))
-
-
 ptbdb_normal_df = pd.read_csv('./data/ptbdb_normal.csv', header=None)
 ptbdb_abnormal_df = pd.read_csv('./data/ptbdb_abnormal.csv', header=None)
 
@@ -53,14 +46,38 @@ features = combined_df.drop(combined_df.columns[-1], axis=1)  # Drop the label c
 X = np.array(features).reshape(-1, 187, 1)
 y = np.array(labels).flatten()
 
-print("X shape:", X.shape)  # Should be (num_samples, 187, 1)
-print("y shape:", y.shape)  # Should be (num_samples,)
 
-print("First few labels:", y[:5])
-print("Unique labels:", np.unique(y))  # Should show 5 classes if you're using mitbih
-print("Unique classes:", np.unique(y))
+# Split into train and test
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
+print("X shape:", X_train.shape)  # Should be (num_samples, 187, 1)
+print("y shape:", y_train.shape)  # Should be (num_samples,)
 
-model.fit(features, labels, epochs=10, validation_split=0.2)
+print("First few labels:", y_train[:5])
+print("Unique labels:", np.unique(y_train)) 
+
+model.fit(X_train, y_train, epochs=10, validation_split=0.2)
 # Save the model
 model.save('one_d_cnn_model.keras')
+
+# Print the model summary again to confirm
+model.summary()
+
+# Evaluate the model on the test set
+loss, accuracy = model.evaluate(X_test, y_test)
+print(f"Test Accuracy: {accuracy:.2f}")
+
+predictions = model.predict(X_test)
+confidences = np.max(predictions, axis=1)
+print("First few predictions:", np.argmax(predictions, axis=1)[:5])
+print("First few confidence scores:", confidences[:5])
+
+# Save test features and labels to CSV files
+if not isinstance(X_test, pd.DataFrame):
+    X_test = pd.DataFrame(X_test.reshape(X_test.shape[0], X_test.shape[1]))
+if not isinstance(y_test, pd.DataFrame):
+    y_test = pd.DataFrame(y_test) 
+
+X_test.to_csv('data/ptbdb_test_features.csv', index=False, header=False)
+y_test.to_csv('data/ptbdb_test_labels.csv', index=False, header=False)
+
