@@ -24,9 +24,11 @@ model = Sequential([
     
     # Output Layer: 5 units for 5 classes (for mitbih)
     # Use 'softmax' for multi-class classification
-    Dense(5, activation='softmax') 
+    #Dense(5, activation='softmax') 
+    
+    # For binary classification (normal vs abnormal)
+    Dense(2, activation='softmax')
 ])
-
 
 # Compile the model
 model.compile(optimizer='adam',
