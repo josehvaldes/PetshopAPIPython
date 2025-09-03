@@ -3,6 +3,15 @@ from peft import LoraConfig, get_peft_model
 from datasets import load_dataset
 import torch
 
+from transformers import BitsAndBytesConfig
+
+bnb_config = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_compute_dtype=torch.float16,
+    bnb_4bit_use_double_quant=True,
+    bnb_4bit_quant_type="nf4"
+)
+
 # Load base Gemma 2B model in 4-bit for VRAM efficiency
 model_path = "c:/personal/_gemma/model/gemma-2b-it"  # local folder
 custom_docs_path = "c:/personal/_gemma/customdocs/converted"  # local folder
@@ -11,9 +20,9 @@ tokenizer = AutoTokenizer.from_pretrained(model_path)
 print("Tokenizer loaded.")
 model = AutoModelForCausalLM.from_pretrained(
     model_path,
-    load_in_4bit=True,                # QLoRA trick: saves VRAM
+    quantization_config=bnb_config,
     device_map="auto",
-    torch_dtype=torch.float16
+    low_cpu_mem_usage=True #solve out of memory error (https://huggingface.co/docs/transformers/main/en/main_classes/model#transformers.PreTrainedModel.from_pretrained
 )
 print("Model loaded.")
 # Define LoRA adapter configuration
