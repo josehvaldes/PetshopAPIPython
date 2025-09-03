@@ -7,3 +7,10 @@ seaborn
 torch --index-url https://download.pytorch.org/whl/cpu
 transformers
 accelerate
+peft
+datasets 
+bitsandbytes
+python-docx 
+PyMuPDF 
+tqdm
+pywin32

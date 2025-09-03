@@ -1,0 +1,70 @@
+﻿from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments, Trainer
+from peft import LoraConfig, get_peft_model
+from datasets import load_dataset
+import torch
+
+# Load base Gemma 2B model in 4-bit for VRAM efficiency
+model_path = "c:/personal/_gemma/model/gemma-2b-it"  # local folder
+custom_docs_path = "c:/personal/_gemma/customdocs/converted"  # local folder
+
+tokenizer = AutoTokenizer.from_pretrained(model_path)
+print("Tokenizer loaded.")
+model = AutoModelForCausalLM.from_pretrained(
+    model_path,
+    load_in_4bit=True,                # QLoRA trick: saves VRAM
+    device_map="auto",
+    torch_dtype=torch.float16
+)
+print("Model loaded.")
+# Define LoRA adapter configuration
+lora_config = LoraConfig(
+    r=16,                             # Rank of LoRA matrices
+    lora_alpha=32,                    # Scaling factor
+    target_modules=["q_proj", "v_proj"], # Which layers to adapt
+    lora_dropout=0.05,
+    bias="none",
+    task_type="CAUSAL_LM"
+)
+
+# Attach LoRA adapter to the model
+
+model = get_peft_model(model, lora_config)
+print("LoRA adapter added to model.")
+model.print_trainable_parameters()  # Verify only LoRA params are trainable
+
+# Load your dataset (replace with your static corpus)
+print(f"Loading dataset from: {custom_docs_path}")
+dataset = load_dataset(custom_docs_path)
+train_data = dataset["train"].map(
+    lambda x: tokenizer(x["quote"], truncation=True, padding="max_length", max_length=256),
+    batched=True
+)
+
+# Training arguments
+training_args = TrainingArguments(
+    output_dir="./gemma2b-lora",
+    per_device_train_batch_size=4,
+    gradient_accumulation_steps=4,
+    learning_rate=2e-4,
+    num_train_epochs=3,
+    logging_steps=10,
+    save_strategy="epoch",
+    fp16=True,
+    optim="paged_adamw_8bit"
+)
+
+# Trainer setup
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=train_data,
+    tokenizer=tokenizer
+)
+
+# Train the adapter
+trainer.train()
+
+# Save adapter weights (small file, can be swapped in/out)
+model.save_pretrained("./gemma2b-lora-adapter")
+
+print("✅ LoRA adapter training complete!")
