@@ -5,6 +5,40 @@ import torch
 
 from transformers import BitsAndBytesConfig
 
+
+# Tokenization function
+def tokenize_function(example):
+    prompt = example["instruction"] + "\n" + example["input"]
+    tokenized = tokenizer(
+        prompt,
+        truncation=True,
+        padding="max_length",
+        max_length=256
+    )
+    tokenized["labels"] = tokenized["input_ids"]  # Self-supervised: input = target
+    return tokenized
+
+
+#not used for now
+def tokenize_function_suppervised_traning(example):
+    model_input = tokenizer(
+        example["input"],
+        truncation=True,
+        padding="max_length",
+        max_length=256
+    )
+    with tokenizer.as_target_tokenizer():
+        labels = tokenizer(
+            example["output"],
+            truncation=True,
+            padding="max_length",
+            max_length=256
+        )
+    model_input["labels"] = labels["input_ids"]
+    return model_input
+
+
+
 bnb_config = BitsAndBytesConfig(
     load_in_4bit=True,
     bnb_4bit_compute_dtype=torch.float16,
@@ -13,8 +47,8 @@ bnb_config = BitsAndBytesConfig(
 )
 
 # Load base Gemma 2B model in 4-bit for VRAM efficiency
-model_path = "c:/personal/_gemma/model/gemma-2b-it"  # local folder
-custom_docs_path = "c:/personal/_gemma/customdocs/converted"  # local folder
+model_path = "/home/azureuser/model/gemma-2b-it/"  # local folder
+custom_docs_path = "/home/azureuser/processed/"  # local folder
 
 tokenizer = AutoTokenizer.from_pretrained(model_path)
 print("Tokenizer loaded.")
@@ -44,22 +78,27 @@ model.print_trainable_parameters()  # Verify only LoRA params are trainable
 # Load your dataset (replace with your static corpus)
 print(f"Loading dataset from: {custom_docs_path}")
 dataset = load_dataset(custom_docs_path)
-train_data = dataset["train"].map(
-    lambda x: tokenizer(x["quote"], truncation=True, padding="max_length", max_length=256),
-    batched=True
-)
+
+# train_data = dataset["train"].map(
+#     lambda x: tokenizer(x["input"], truncation=True, padding="max_length", max_length=256),
+#     batched=True
+# )
+
+train_data = dataset["train"].map(tokenize_function, batched=False)
 
 # Training arguments
 training_args = TrainingArguments(
     output_dir="./gemma2b-lora",
-    per_device_train_batch_size=4,
-    gradient_accumulation_steps=4,
+    per_device_train_batch_size=2,
+    gradient_accumulation_steps=8,
     learning_rate=2e-4,
     num_train_epochs=3,
     logging_steps=10,
     save_strategy="epoch",
     fp16=True,
-    optim="paged_adamw_8bit"
+    optim="paged_adamw_8bit",
+    save_steps=500,
+    evaluation_strategy="no",  # since it's unsupervised
 )
 
 # Trainer setup
@@ -70,9 +109,11 @@ trainer = Trainer(
     tokenizer=tokenizer
 )
 
+print("Starting LoRA adapter training...")
 # Train the adapter
 trainer.train()
 
+print("Training finished.")
 # Save adapter weights (small file, can be swapped in/out)
 model.save_pretrained("./gemma2b-lora-adapter")
 
