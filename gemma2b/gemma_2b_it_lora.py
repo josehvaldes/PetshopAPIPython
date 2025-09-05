@@ -5,7 +5,6 @@ import torch
 
 from transformers import BitsAndBytesConfig
 
-
 # Tokenization function
 def tokenize_function(example):
     prompt = example["instruction"] + "\n" + example["input"]
@@ -98,7 +97,7 @@ training_args = TrainingArguments(
     fp16=True,
     optim="paged_adamw_8bit",
     save_steps=500,
-    evaluation_strategy="no",  # since it's unsupervised
+    eval_strategy="no",  # since it's unsupervised
 )
 
 # Trainer setup
