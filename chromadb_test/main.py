@@ -1,6 +1,9 @@
 ﻿import json
 import chromadb
 
+from sentence_transformers import SentenceTransformer
+from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
+
 jsonl_path = "c:/personal/_gemma/customdocs/converted/dogs_dataset.jsonl"
 
 def load_jsonl(path):
@@ -44,11 +47,20 @@ def main():
     print(f"Loaded {len(data)} records from {jsonl_path}")
 
     breed_documents, breed_ids, metadatas = extract_documents_and_ids(data)
-    print("Metadatas:")
-    print(metadatas[:])
     
     client = chromadb.Client() # Can be set to save to disk
-    collection = client.create_collection("sales_reports")
+   
+    #default all-MiniLM-L6-v2 embedded model
+    #embedded_model = "all-MiniLM-L6-v2" # good answer: [['PEKINÉS', 'SHIH-TZU', 'SHAR PEI', 'CHOW-CHOW', 'CHIHUAHUA']]
+    #embedded_model = "all-mpnet-base-v2" # not expected answer: [['AFGANO', 'PEKINÉS', 'CARLINO O PUG', 'SHIH-TZU', 'EL BOYERO DE BERNA']]
+    #embedded_model = "intfloat/e5-large" # good answer: [['SHIH-TZU', 'CHOW-CHOW', 'SHAR PEI', 'PEKINÉS', 'BASSET HOUND']]
+    #embedded_model = "intfloat/e5-large-v2" # so so : [['SHAR PEI', 'CHOW-CHOW', 'CHIHUAHUA', 'AFGANO', 'SHIH-TZU']]
+    embedded_model = "BAAI/bge-large-en-v1.5" # good answer: [['CHOW-CHOW', 'PEKINÉS', 'SHAR PEI', 'SHIH-TZU', 'MASTÍN NAPOLITANO']]
+    
+    embedding_fn = SentenceTransformerEmbeddingFunction(embedded_model)
+    collection = client.create_collection(name="dog_breeds", embedding_function=embedding_fn)
+    
+    
 
     collection.upsert(
         documents=breed_documents,
@@ -57,7 +69,7 @@ def main():
     )
 
     results = collection.query(
-        query_texts=["Nacionalidad China"],
+        query_texts=["nacionalidad china"],
         n_results=5, # how many results to return
     )
     print("Results:")

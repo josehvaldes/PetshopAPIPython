@@ -1,0 +1,6 @@
+pandas
+Faker
+chromadb
+numpy
+seaborn
+sentence_transformers

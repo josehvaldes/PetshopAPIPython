@@ -1,6 +1,5 @@
 pandas
 Faker
-chromadb
 numpy
 matplotlib
 tensorflow
