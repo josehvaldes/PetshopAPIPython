@@ -1,0 +1,6 @@
+pandas
+pymilvus
+numpy
+milvus_model
+pymilvus[model]
+sentence_transformers
