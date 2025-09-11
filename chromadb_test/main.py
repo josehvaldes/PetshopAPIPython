@@ -52,15 +52,16 @@ def main():
    
     #default all-MiniLM-L6-v2 embedded model
     #embedded_model = "all-MiniLM-L6-v2" # good answer: [['PEKINÉS', 'SHIH-TZU', 'SHAR PEI', 'CHOW-CHOW', 'CHIHUAHUA']]
-    #embedded_model = "all-mpnet-base-v2" # not expected answer: [['AFGANO', 'PEKINÉS', 'CARLINO O PUG', 'SHIH-TZU', 'EL BOYERO DE BERNA']]
     #embedded_model = "intfloat/e5-large" # good answer: [['SHIH-TZU', 'CHOW-CHOW', 'SHAR PEI', 'PEKINÉS', 'BASSET HOUND']]
     #embedded_model = "intfloat/e5-large-v2" # so so : [['SHAR PEI', 'CHOW-CHOW', 'CHIHUAHUA', 'AFGANO', 'SHIH-TZU']]
-    embedded_model = "BAAI/bge-large-en-v1.5" # good answer: [['CHOW-CHOW', 'PEKINÉS', 'SHAR PEI', 'SHIH-TZU', 'MASTÍN NAPOLITANO']]
+    #embedded_model = "BAAI/bge-large-en-v1.5" # good answer: [['CHOW-CHOW', 'PEKINÉS', 'SHAR PEI', 'SHIH-TZU', 'MASTÍN NAPOLITANO']]
+    #embedded_model = "all-mpnet-base-v2" # not expected answer: [['AFGANO', 'PEKINÉS', 'CARLINO O PUG', 'SHIH-TZU', 'EL BOYERO DE BERNA']]
     
+    #embedded_model = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+    embedded_model = "intfloat/multilingual-e5-large" #[['SHIH-TZU', 'PEKINÉS', 'CHIHUAHUA', 'CHOW-CHOW', 'SHAR PEI']]
+
     embedding_fn = SentenceTransformerEmbeddingFunction(embedded_model)
     collection = client.create_collection(name="dog_breeds", embedding_function=embedding_fn)
-    
-    
 
     collection.upsert(
         documents=breed_documents,
@@ -69,7 +70,7 @@ def main():
     )
 
     results = collection.query(
-        query_texts=["nacionalidad china"],
+        query_texts=["rescate", "aleman"],
         n_results=5, # how many results to return
     )
     print("Results:")

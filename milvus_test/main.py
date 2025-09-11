@@ -2,8 +2,6 @@
 from pymilvus import connections, FieldSchema, CollectionSchema, DataType, Collection, utility
 from pymilvus import model
 
-from sentence_transformers import SentenceTransformer
-
 jsonl_path = "c:/personal/_gemma/customdocs/converted/dogs_dataset.jsonl"
 
 def load_jsonl(path):
@@ -51,46 +49,40 @@ def main():
         FieldSchema(name="vector", dtype=DataType.FLOAT_VECTOR, dim=768),
     ]
     
-    collection_name = "dogs_breeds_collection3"
+    collection_name = "dogs_breeds_collection_1"
 
     schema = CollectionSchema(fields, description="Example collection with embedding field")
     
     collection = Collection(name=collection_name, schema=schema)
 
-    
-    data = load_jsonl(jsonl_path)
-    breed_documents, breed_ids, metadatas = extract_documents_and_ids(data)
-
     embedding_fn = model.DefaultEmbeddingFunction()
-    vectors = embedding_fn.encode_documents(breed_documents)
-
-    data = [
-        {"id": breed_ids[i], "vector": vectors[i], "text": breed_documents[i], 
-         "metadata": metadatas[i], "subject": "dog_breed"} 
-        for i in range(len(breed_ids))    
-    ]
-
-    
-    res = collection.insert([breed_ids, vectors])
-    
-    print(f"Inserted {len(res.primary_keys)} entities")  
 
     collection.release()
     collection.drop_index()
 
     # Alternative index
-    # index_params = {"index_type": "IVF_PQ", 
-    #                         "params": {"nlist": 128, "m":32, "nbits":8}, 
-    #                         "metric_type": "L2"}
+    index_params = {"index_type": "IVF_PQ", 
+                            "params": {"nlist": 128, "m":32, "nbits":8}, 
+                            "metric_type": "L2"}
     
-    index_params = {
-        "index_type": "IVF_FLAT",
-        "params": {"nlist": 128},
-        "metric_type": "L2"
-    }
+    # index_params = {
+    #     "index_type": "IVF_FLAT",
+    #     "params": {"nlist": 128},
+    #     "metric_type": "L2"
+    # }
     
     collection.create_index("vector", index_params)
     print("Index created:", [index.params for index in collection.indexes])
+
+    data = load_jsonl(jsonl_path)
+    breed_documents, breed_ids, metadatas = extract_documents_and_ids(data)
+
+    vectors = embedding_fn.encode_documents(breed_documents)
+    
+    res = collection.insert([breed_ids, vectors])
+    
+    print(f"Inserted {len(res.primary_keys)} entities")  
+
     collection.load()
 
     print("Collection loaded")
@@ -107,6 +99,7 @@ def main():
         print(f"Top {len(result)} results:")
         for hit in result:
             print(f"ID: {hit.entity.get('id')}, Distance: {hit.distance}")
+            print(f"entity: {hit.entity}")
     
     print("Search completed")
 
