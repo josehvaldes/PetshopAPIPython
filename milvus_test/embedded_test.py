@@ -45,7 +45,7 @@ def main():
 
     connections.connect(host='127.0.0.1', port='19530')
 
-    collection_name = "Dogs_Info_Collection_4"
+    collection_name = "Dogs_Info_Collection_8"
     if utility.has_collection(collection_name):
         print("Connected to Milvus!")
     else:
@@ -53,42 +53,42 @@ def main():
 
     fields = [
         FieldSchema(name="id", dtype=DataType.VARCHAR, is_primary=True, max_length=64),
-        FieldSchema(name="embedding", dtype=DataType.FLOAT_VECTOR, dim=384),  # Adjust the embedding dimension
+        FieldSchema(name="embedding", dtype=DataType.FLOAT_VECTOR, dim=768), #384 for HNSW # Adjust the embedding dimension
         FieldSchema(name="text", dtype=DataType.VARCHAR, max_length=10000)
     ]
     
 
     # Create a collection schema
-    schema = CollectionSchema(fields, description="ID and Text and Embeddings collection")
+    schema = CollectionSchema(fields, description="ID and Text and Embeddings collection 6")
 
     # Create the collection
     collection = Collection(collection_name, schema=schema)
     
     index_params = {"index_type": "HNSW", "params": {"M": 16, "efConstruction": 200}, "metric_type": "COSINE"}
     #index_params = {"index_type": "IVF_PQ", "params": {"nlist": 128, "m":32, "nbits":8}, "metric_type": "L2"}
+    #index_params = { "index_type": "IVF_FLAT", "params": {"nlist": 128}, "metric_type": "L2"}
     
     index = Index(collection, "embedding", index_params)
     print("Index created:", index.params)
 
     # Load a pre-trained model to generate embeddings
-    model = SentenceTransformer('all-MiniLM-L6-v2')
+    model = SentenceTransformer('all-mpnet-base-v2')
     
     data = load_jsonl(jsonl_path)
     texts , breed_ids, metadatas = extract_documents_and_ids(data)
 
     # Generate embeddings for the texts
-    embeddings = model.encode(texts )
+    embeddings = model.encode(texts)
 
     # Insert the data (texts and embeddings) into the collection
-    data = [breed_ids, embeddings, texts ]  # Milvus requires data as a list of columns
+    data = [breed_ids, embeddings, texts]  # Milvus requires data as a list of columns
     collection.insert(data)
 
     # Load the collection (helps optimize query performance)
     collection.load()
-
-
+    print(f"Number of entities in the collection: {collection.num_entities}")
     #Example text query
-    query_text = "IRLANDÉS"
+    query_text = "maltes"
 
     # Generate embedding for the query text
     query_embedding = model.encode([query_text])
@@ -98,10 +98,11 @@ def main():
         data=query_embedding,  # The query embedding
         anns_field="embedding",  # Field that contains the embeddings
         param={"metric_type": "COSINE", "params": {"ef": 128}},  # Search parameters
-        limit=4,  # Number of results to return
+        limit=5,  # Number of results to return
         expr=None  # Optional filtering expression
     )
 
+    # Type IVF_PQ or IVF_FLAT
     # search_params = {"metric_type": "L2", "params": {"nprobe": 64}}
     # results = collection.search(query_embedding, 
     #                         "embedding", 
@@ -112,7 +113,6 @@ def main():
     # Print the results
     for result in results[0]:
         print(f"ID: {result.entity.get('id')} Matched text: {result.entity.get('text')}, similarity score: {result.distance}")
-        print(f"Matched text: {result.entity.get('text')}")
 
 
 if __name__ == "__main__":
