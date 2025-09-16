@@ -1,6 +1,9 @@
-﻿transformers 
-sentence-transformers
+﻿pandas
+sentence_transformers
+transformers 
+pymilvus
 langchain
 langchain-community
+langchain-milvus
 torch --index-url https://download.pytorch.org/whl/cpu
-#pytorch
+faiss-cpu
