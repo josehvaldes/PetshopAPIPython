@@ -13,7 +13,7 @@ def main():
         FieldSchema(name="text", dtype=DataType.VARCHAR, max_length=10000)
     ]
     
-    collection_name = "Dogs_Info_Collection_6"
+    collection_name = "Dogs_Info_Collection_en_1"
 
     schema = CollectionSchema(fields, description="ID and Text and Embeddings collection 6")
     
@@ -26,14 +26,22 @@ def main():
     #embedding_fn = model.DefaultEmbeddingFunction()
     model = SentenceTransformer('paraphrase-multilingual-mpnet-base-v2')
     
-    query_vectors = model.encode(["malta"])
+    query_vectors = model.encode(["Germany"])
 
     search_params = {"metric_type": "L2", "params": {"nprobe": 32}}
-    results = collection.search(query_vectors, 
-                                "embedding", 
-                                param=search_params, 
-                                limit=5,
-                                output_fields=["id", "text"])
+    # results = collection.search(query_vectors, 
+    #                             "embedding", 
+    #                             param=search_params, 
+    #                             limit=5,
+    #                             output_fields=["id", "text"])
+
+    results = collection.search(
+        data=query_vectors,  # The query embedding
+        anns_field="embedding",  # Field that contains the embeddings
+        param={"metric_type": "COSINE", "params": {"ef": 128}},  # Search parameters
+        limit=5,  # Number of results to return
+        expr=None  # Optional filtering expression
+    )
     
     print(f"Search results: {len(results)} queries")
     for result in results:
