@@ -1,0 +1,10 @@
+﻿langchain
+langchain-community
+langchain-milvus
+langchain_core
+langgraph
+torch --index-url https://download.pytorch.org/whl/cpu
+faiss-cpu
+transformers
+sentence-transformers
+langdetect
