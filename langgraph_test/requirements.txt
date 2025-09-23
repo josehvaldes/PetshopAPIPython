@@ -8,3 +8,4 @@ faiss-cpu
 transformers
 sentence-transformers
 langdetect
+langchain-huggingface

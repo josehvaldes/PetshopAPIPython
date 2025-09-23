@@ -1,12 +1,11 @@
-from agent_state_lib import AgentState, MemoryDict
+from agent_state_lib import AgentState, SimpleMessageHistory
 from langchain.vectorstores import Milvus
-from langchain.memory import VectorStoreRetrieverMemory
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_milvus import Milvus
-from langchain.memory import ConversationBufferMemory
 from petshop_memory.conversation_memory import SQLiteConversationMemory
 from petshop_memory.profile_memory import SQLiteProfileMemory
 
+from langchain_core.runnables import RunnableLambda
 
 # Embedding model
 embedding_model = HuggingFaceEmbeddings(model_name="multi-qa-mpnet-base-dot-v1")
@@ -18,39 +17,52 @@ retriever = Milvus(
     connection_args={"host": "localhost", "port": "19530"}
 ).as_retriever(search_kwargs={"k": 5})
 
+# Define a node that retrieves memory
+def retrieve_facts_memory(state:AgentState)-> AgentState:
 
-def load_memory(db_path:str, user_id:str, facts_key:str) -> MemoryDict:
+    query = state["embedded_question"]
+    docs = retriever.invoke(query)
+    content = [ doc.page_content for doc in docs ]
+    content_str = "\n".join(content)
+    return {**state, "facts_memory": content_str}
 
-    milvus_facts = VectorStoreRetrieverMemory(retriever=retriever, memory_key=facts_key)
-
-    chat_memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+def retrieve_chat_history(state:AgentState)-> AgentState:
+    db_path = state["db_path"]
+    user_id = state["user_id"]
 
     chat_history_handler = SQLiteConversationMemory(db_path)
-    chat_data = chat_history_handler.load_memory_variables(user_id)
-    messages = chat_data["chat_history"]
-    for msg in messages:
-        chat_memory.chat_memory.add_message(msg)
-
+    response = chat_history_handler.load_memory_variables(user_id)
     chat_history_handler.close()
 
+    messages = response["chat_history"]
+
+    chat_memory_str = "\n".join([
+      f"Human: {msg.content}" if msg.type == "human" else f"AI: {msg.content}"
+        for msg in messages
+    ])
+
+    return {**state, "chat_memory": chat_memory_str}
+
+def retrieve_profile_memory(state:AgentState)-> AgentState:
+    db_path = state["db_path"]
+    user_id = state["user_id"]
     profile_memory_handler = SQLiteProfileMemory(db_path)
     profile_memory = profile_memory_handler.get_pet_summary(user_id)
     profile_memory_handler.close()
+    
+    profile_memory_str = '\n'.join(profile_memory)
 
-    return {
-        "facts_memory": milvus_facts,
-        "chat_memory": chat_memory,
-        "profile_memory": profile_memory
-    }
+    return {**state, "profile_memory": profile_memory_str}
 
+def load_memory_nodes() -> RunnableLambda:
 
-# def retrieve_dog_profile(state:AgentState):
-#     dog_info = state["memory"].load_memory_variables({})
-#     return {"dog_profile": dog_info}
+    # Wrap it as a Runnable
+    fact_memory_node = RunnableLambda(retrieve_facts_memory)
 
-# def update_dog_age(state:AgentState):
-#     new_age = state["input"]["age"]
-#     state["memory"].save_context({"input": "update"}, {"output": f"Dog age is now {new_age}"})
-#     return state
+    chat_memory_node = RunnableLambda(retrieve_chat_history)
 
+    profile_memory_node = RunnableLambda(retrieve_profile_memory)
+    
+    chain = fact_memory_node|chat_memory_node|profile_memory_node
 
+    return chain
