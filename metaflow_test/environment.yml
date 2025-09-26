@@ -6,3 +6,9 @@ dependencies:
   - pip
   - metaflow
   - ipykernel
+  - langchain
+  - langchain-core
+  - langchain-huggingface
+  - pip  
+  - pip:
+      - langchain-milvus
