@@ -9,3 +9,4 @@ __azurite_db_queue_extent__.json
 __azurite_db_table__.json
 milvus_test/volumes/
 datageneratorapp/data/
+metaflow_test/.metaflow/

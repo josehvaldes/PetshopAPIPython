@@ -1,0 +1,8 @@
+name: cvenv
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - pip
+  - metaflow
+  - ipykernel
