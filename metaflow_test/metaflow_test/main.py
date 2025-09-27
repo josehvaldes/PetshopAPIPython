@@ -19,7 +19,7 @@ class HelloFlow(FlowSpec):
         print("HelloFlow is starting.")
         self.db_path = "../sqlite_test/petshopdb/petshop_database.db"
         self.user_id = "pepuso"
-        self.embedded_query = ""
+        self.embedded_query = "dogs from china"
         self.next(self.load_profile_memory, self.load_conversation_memory, self.load_facts_memory)
 
     @step
@@ -66,7 +66,7 @@ class HelloFlow(FlowSpec):
         A step for metaflow to load_facts_memory.
         """
         print("Metaflow says: load_facts_memory!")
-        from langchain.vectorstores import Milvus
+        from langchain_milvus import Milvus
         from langchain_huggingface import HuggingFaceEmbeddings
 
         try:
@@ -77,14 +77,12 @@ class HelloFlow(FlowSpec):
             retriever = Milvus(
                 embedding_model,
                 collection_name="Dogs_Breeds_milvus_EN_1",
-                connection_args={"host": "172.23.208.1", "port": "19530"}
+                connection_args={"uri": "http://172.23.208.1:19530"}
             ).as_retriever(search_kwargs={"k": 5})
 
-            print("retriever created:", self.embedded_query)
             docs = retriever.invoke(self.embedded_query)
             content = [ doc.page_content for doc in docs ]
             content_str = "\n".join(content)
-            print("Facts memory:", content_str)
             self.facts_memory = content_str
         except Exception as e:
             print(f"Error in load_facts_memory: {e}")
@@ -101,11 +99,15 @@ class HelloFlow(FlowSpec):
         
         self.profile_memory = inputs.load_profile_memory.profile_memory
         self.conversation_memory = inputs.load_conversation_memory.conversation_memory
+        self.facts_memory = inputs.load_facts_memory.facts_memory
+        
         print("Metaflow says: Memory recovered")
         print("Profile memory:")
         print(self.profile_memory)
         print("Conversation memory:")
         print(self.conversation_memory)
+        print("Facts memory:")
+        print(self.facts_memory)
         self.next(self.end)
 
     @step
