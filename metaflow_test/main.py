@@ -20,7 +20,7 @@ class HelloFlow(FlowSpec):
         self.db_path = "../sqlite_test/petshopdb/petshop_database.db"
         self.user_id = "pepuso"
         self.embedded_query = ""
-        self.next(self.load_profile_memory, self.load_conversation_memory)
+        self.next(self.load_profile_memory, self.load_conversation_memory, self.load_facts_memory)
 
     @step
     def load_profile_memory(self):
@@ -80,17 +80,17 @@ class HelloFlow(FlowSpec):
                 connection_args={"host": "172.23.208.1", "port": "19530"}
             ).as_retriever(search_kwargs={"k": 5})
 
-            print(f"retriever created! {self.embedded_query}")
+            print("retriever created:", self.embedded_query)
             docs = retriever.invoke(self.embedded_query)
             content = [ doc.page_content for doc in docs ]
             content_str = "\n".join(content)
+            print("Facts memory:", content_str)
             self.facts_memory = content_str
         except Exception as e:
             print(f"Error in load_facts_memory: {e}")
             self.facts_memory = "Error retrieving facts memory."
-        finally:
-            self.next(self.join)
         
+        self.next(self.join)
 
     @step
     def join(self, inputs):
