@@ -7,13 +7,6 @@ common:
   deployMode: standalone
   storageType: remote
   storage: azure
-  bucketName: milvusfiles
-  azure:
-    accountName: stpetshopmilvus
-    containerName: milvusfiles
-  minio:
-    enabled: false
-    endpoint: ""
 
 # Disable MinIO completely
 minio:
@@ -38,7 +31,7 @@ serviceAccount:
   create: true
   name: milvus-sa
   annotations:
-    azure.workload.identity/client-id: "dada9585-daf7-48f4-aca4-6e4e5530f037"
+    azure.workload.identity/client-id: "c9fd7803-1ab9-4b3e-af76-7d12ad5f0e91"
 
 externalS3:
   enabled: true
@@ -47,48 +40,26 @@ externalS3:
   rootPath: milvus #release name
   useSSL: true
   useIAM: true
-  bucketName: milvusfiles #container name
+  bucketName: milvusfiles01 #container name
   cloudProvider: azure
-  accessKey: "stpetshopmilvus" # the storage account name
+  accessKey: "stpetshopmilvus01" # the storage account name
   secretKey: "" # No storage account key
 
 
 # Milvus standalone pod configuration
 standalone:
   serviceAccountName: milvus-sa
-  extraArgs:
-    - "run"
-    - "standalone"
+
   nodeSelector:
     kubernetes.io/arch: amd64
   
   livenessProbe:
     enabled: false
 
-#remove and test functionality
-  extraEnv:
-    - name: DEPLOY_MODE
-      value: "standalone"
-    - name: STORAGE_TYPE
-      value: "azure"
-    - name: AZURE_STORAGE_ACCOUNT
-      value: "stpetshopmilvus"
-    - name: AZURE_STORAGE_CONTAINER
-      value: "milvusfiles"
-    - name: AZURE_STORAGE_ENDPOINT
-      value: "stpetshopmilvus.blob.core.windows.net"
-    - name: MINIO_USE_AZURE
-      value: "true" 
-  
-  #remove and test functionality
-  command: ["/milvus/bin/milvus"]
-  args: ["run", "standalone"]
-
   persistence:
     enabled: true
     size: 20Gi #remove
     storageClass: default
-
 
 # etcd configurationI have
 etcd:
@@ -106,8 +77,6 @@ pulsarv3:
   enabled: false
 
 # Disable all distributed components
-mixCoordinator:
-  enabled: false
 queryNode:
   enabled: false
 dataNode:
