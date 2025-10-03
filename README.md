@@ -1,6 +1,6 @@
 # Petshop API
 
-This is a FastAPI application for managing a pet shop. It provides an API to handle items available in the shop.
+This is a FastAPI application and Python scripts for POC and tests fo ChromaDB, Milvus, LangChain, LangGraph, Helm, Azure OoenAI, Azure AI Foundry, AKS, ect
 
 ## Project Structure
 
