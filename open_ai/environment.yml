@@ -1,0 +1,12 @@
+name: oaivenv
+channels:
+  - default
+  - conda-forge
+dependencies:
+  - pip
+  - pip:
+    - azure-ai-projects
+    - azure-identity
+    - azure-ai-agents
+
+  
