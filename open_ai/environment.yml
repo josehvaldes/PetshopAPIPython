@@ -3,10 +3,16 @@ channels:
   - default
   - conda-forge
 dependencies:
-  - pip
+  - tiktoken 
+  - langchain
+  - openai
+  - pip  
   - pip:
     - azure-ai-projects
     - azure-identity
     - azure-ai-agents
-
+    - azure-search-documents
+    - semantic-text-splitter
+    - tokenizers
+    - pydantic_settings
   

@@ -10,3 +10,5 @@ __azurite_db_table__.json
 milvus_test/volumes/
 datageneratorapp/data/
 metaflow_test/.metaflow/
+open_ai/config/config.dev.toml
+open_ai/app/.env
