@@ -55,6 +55,7 @@ class AppSettings(BaseModel):
     azure_openai_key: str = Field(default="")
     azure_openai_version: str = Field(default="")
     azure_openai_embedded_model: str = Field(default="")  # e.g., "text-embedding-3-small"
+    azure_openai_model_deployment_name :str = Field(default="")  
 
     #azure_ai_search
     azure_ai_search_endpoint: str = Field(default="")
@@ -111,6 +112,7 @@ def get_settings() -> AppSettings:
             "azure_openai_key": raw["azure_openai"].get("key"),
             "azure_openai_version": raw["azure_openai"].get("version"),
             "azure_openai_embedded_model": raw["azure_openai"].get("embedded_model"),
+            "azure_openai_model_deployment_name": raw["azure_openai"].get("model_deployment_name"),
         })
     if "azure_ai_search" in raw:
         flat.update({

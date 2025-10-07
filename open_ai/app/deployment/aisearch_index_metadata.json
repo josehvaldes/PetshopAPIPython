@@ -27,6 +27,12 @@
       "type": "Edm.String",
       "filterable": true,
       "retrievable": true
+    },
+    {
+      "name": "file_name",
+      "type": "Edm.String",
+      "filterable": true,
+      "retrievable": true
     }
   ],
   "vectorSearch": {
