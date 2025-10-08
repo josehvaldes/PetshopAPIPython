@@ -2,8 +2,7 @@ import argparse
 import os
 from openai import AzureOpenAI
 from azure.search.documents import SearchClient
-from azure.core.credentials import AzureKeyCredential
-from app.settings import AppSettings, get_settings
+from app.settings import get_settings
 from collections import defaultdict
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 
@@ -65,9 +64,9 @@ def search_by_properties():
     
     results = search_client.search(
         search_text=query, 
-        select=["id", "breed_name"],
+        select=["id", "breed_name", "content", "file_name"],
         filter = "breed_name eq 'BOXER'",
-        top=5,
+        top=5
         )
 
     for result in results:

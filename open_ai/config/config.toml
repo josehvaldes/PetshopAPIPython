@@ -17,9 +17,13 @@ endpoint = ""
 key = ""
 version = ""
 embedded_model = ""
+model_deployment_name = ""
 
 [azure_ai_search]
 search = ""
 index_name = ""
 key = ""
 
+[azure_ai_foundry]
+endpoint = ""
+agent_id = ""

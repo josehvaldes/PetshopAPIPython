@@ -62,6 +62,10 @@ class AppSettings(BaseModel):
     azure_ai_search_index_name: str = Field(default="")
     azure_ai_search_key: str = Field(default="")
 
+    #azure_ai_foundry
+    azure_ai_foundry_endpoint: str = Field(default="")
+    azure_ai_foundry_agent_id: str = Field(default="")
+
     # Derived / computed values
     @property
     def database_url(self) -> str:
@@ -119,6 +123,11 @@ def get_settings() -> AppSettings:
             "azure_ai_search_endpoint": raw["azure_ai_search"].get("endpoint"),
             "azure_ai_search_index_name": raw["azure_ai_search"].get("index_name"),
             "azure_ai_search_key": raw["azure_ai_search"].get("key"),
+        })
+    if "azure_ai_foundry" in raw:
+        flat.update({
+            "azure_ai_foundry_endpoint": raw["azure_ai_foundry"].get("endpoint"),
+            "azure_ai_foundry_agent_id": raw["azure_ai_foundry"].get("agent_id"),
         })
 
     return AppSettings(**{k: v for k, v in flat.items() if v is not None})
