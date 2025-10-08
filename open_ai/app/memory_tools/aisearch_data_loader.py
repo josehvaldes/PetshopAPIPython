@@ -39,7 +39,7 @@ def embed_texts(texts):
 def load_vector(vector_files:list[VectorizedFile]):
     print(f"Embedding and indexing {len(vector_files)} files...")
     
-    for vf in vector_files[0:20]:  # Limit to first file for testing
+    for vf in vector_files:  # Limit to first file for testing
         if len(vf['texts']) > 0:
             print(f"Embedding file: {vf['file_name']} with {len(vf['texts'])} text chunks.")
             embeddings = embed_texts(vf['texts'])
@@ -48,7 +48,7 @@ def load_vector(vector_files:list[VectorizedFile]):
             print(f"File: {vf['file_name']} has no texts to embed.")
         
         docs_to_index = []
-        print(f"Preparing documents for indexing. Filenam: {vf["file_name"]}")
+        print(f"Preparing documents for indexing. Filename: {vf["file_name"]}")
         if len(vf["vectors"])> 0 and len(vf['texts']) > 0 and  len(vf["vectors"]) == len(vf['texts']):
             for vector, text in zip(vf["vectors"], vf["texts"]):
                 docs_to_index.append(

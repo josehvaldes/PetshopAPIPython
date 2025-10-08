@@ -24,6 +24,9 @@ search_client = SearchClient(
     endpoint = settings.azure_ai_search_endpoint,
     index_name = settings.azure_ai_search_index_name,
     credential = DefaultAzureCredential()
+    #To use Keys instead of AD token
+    #from azure.core.credentials import AzureKeyCredential
+    #credential = AzureKeyCredential(settings.azure_ai_search_key)
 )
 
 

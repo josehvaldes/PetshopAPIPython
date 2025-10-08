@@ -42,10 +42,10 @@ def get_vector_embedding(text):
 
 def delete():
     """Delete all documents in the index."""
-    print("Deleting all documents in the index...")
+    print("Deleting a document in the index...")
+
     result = search_client.delete_documents(
-        documents=[{"id": "*"}],  # Delete all documents
-        key_field_name="id"
+        documents=[{"id": "e588c2a9-7a8b-4b40-a257-197f81b73251"}],
     )
     print(f"Delete result: {result}")
     return result

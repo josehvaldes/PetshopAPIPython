@@ -29,8 +29,8 @@ with AIProjectClient(
         index_connection_id=conn_id,
         index_name=settings.azure_ai_search_index_name,
         query_type=AzureAISearchQueryType.SIMPLE,
-        top_k=3,
-        filter="",
+        top_k=5,
+
     )
 
     agents_client = project_client.agents
@@ -50,7 +50,7 @@ with AIProjectClient(
     message = agents_client.messages.create(
         thread_id=thread.id,
         role="user",
-        content="which dogs are good for search and rescue? Give top 4 breeds and cite your sources.",
+        content="which dogs are good for search and rescue? Give top 3 breeds and cite your sources. Use the Azure AI Search tool to find the information.",
     )
     print(f"Created message, ID: {message.id}")
 
