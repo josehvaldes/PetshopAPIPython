@@ -1,3 +1,12 @@
+"""
+Application settings and configuration loading.
+Loads from:
+  - config/config.toml (base)
+    - config/config.{env}.toml (optional overlay, where env=APP_ENV or "dev" if missing)
+    - environment variables (override)
+Uses pydantic for validation and type coercion.
+"""
+
 from pathlib import Path
 from functools import lru_cache
 from typing import Optional
@@ -66,6 +75,9 @@ class AppSettings(BaseModel):
     azure_ai_foundry_endpoint: str = Field(default="")
     azure_ai_foundry_agent_id: str = Field(default="")
 
+    azure_storage_table_service_url: str = Field(default="")
+    azure_storage_table_name: str = Field(default="")
+
     # Derived / computed values
     @property
     def database_url(self) -> str:
@@ -128,6 +140,11 @@ def get_settings() -> AppSettings:
         flat.update({
             "azure_ai_foundry_endpoint": raw["azure_ai_foundry"].get("endpoint"),
             "azure_ai_foundry_agent_id": raw["azure_ai_foundry"].get("agent_id"),
+        })
+    if "azure_storage_account" in raw:
+        flat.update({
+            "azure_storage_table_service_url": raw["azure_storage_account"].get("table_service_url"),
+            "azure_storage_table_name": raw["azure_storage_account"].get("table_name"),
         })
 
     return AppSettings(**{k: v for k, v in flat.items() if v is not None})

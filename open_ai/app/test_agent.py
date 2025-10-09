@@ -1,14 +1,22 @@
-import os
+"""
+Test script to create and run an agent with Azure AI Search tool integration.
+prerequisites:
+- Azure AI Search index with vector search enabled
+- Azure OpenAI resource with GPT-4o-mini or similar model deployment
+- Azure AI Foundry resource
+- Python packages: azure-ai-projects, azure-identity
+- Configuration in app/settings.py for Azure resources
+
+Authentication:
+- Use DefaultAzureCredential for authentication, ensure your environment is configured for it.
+
+"""
 from app.settings import get_settings
-#from app.memory_tools.milvus_tool import milvus_tool, milvus_search
-#from app.memory_tools.profile_tool import user_profile_tool, user_profile_lookup
-from app.memory_tools.azure_ai_search_tool import ai_search_tool, azure_ai_search
 
 from azure.ai.projects import AIProjectClient
 from azure.identity import DefaultAzureCredential
 from azure.ai.agents.models import AzureAISearchQueryType, AzureAISearchTool, ListSortOrder, MessageRole
 from azure.ai.projects.models import ConnectionType
-
 
 settings = get_settings()
 
@@ -91,7 +99,7 @@ with AIProjectClient(
     messages = agents_client.messages.list(thread_id=thread.id, order=ListSortOrder.ASCENDING)
     for message in messages:
         if message.role == MessageRole.AGENT and message.url_citation_annotations:
-            print("Agent message with citations:")
+            print(" Agent message with citations:")
             placeholder_annotations = {
                 annotation.text: f" [see {annotation.url_citation.title}] ({annotation.url_citation.url})"
                 for annotation in message.url_citation_annotations
@@ -100,11 +108,11 @@ with AIProjectClient(
                 message_str = message_text.text.value
                 for k, v in placeholder_annotations.items():
                     message_str = message_str.replace(k, v)
-                print(f"{message.role}: {message_str}")
+                print(f"    {message.role}: {message_str}")
         else:
-            print("Message without citations:")
+            print(" Message without citations:")
             for message_text in message.text_messages:
-                print(f"{message.role}: {message_text.text.value}")
+                print(f"    {message.role}: {message_text.text.value}")
     # [END populate_references_agent_with_azure_ai_search_tool]
 
     print("Done.") 

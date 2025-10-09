@@ -1,3 +1,4 @@
+"""Utility to parse a JSONL file and return a dictionary of files."""
 import json
 import traceback
 

@@ -27,3 +27,9 @@ key = ""
 [azure_ai_foundry]
 endpoint = ""
 agent_id = ""
+
+[azure_storage_account]
+table_service_url  = ""
+table_name = ""
+
+

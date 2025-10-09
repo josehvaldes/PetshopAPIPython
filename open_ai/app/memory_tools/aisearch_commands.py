@@ -1,11 +1,41 @@
+"""
+Azure AI Search command tool for managing and querying the search index.
+Prequisites:
+- Python 3.8+
+- pip install openai azure-search-documents azure-identity
+- Azure OpenAI resource with embedding model deployment
+- Azure AI Search resource with vector index
+- Appropriate environment variables set in .env file or system environment:
+    - AZURE_OPENAI_ENDPOINT
+    - AZURE_OPENAI_KEY
+    - AZURE_OPENAI_VERSION
+    - AZURE_OPENAI_EMBEDDED_MODEL
+    - AZURE_OPENAI_MODEL_DEPLOYMENT_NAME
+    - AZURE_AI_SEARCH_ENDPOINT
+    - AZURE_AI_SEARCH_KEY
+    - AZURE_AI_SEARCH_INDEX_NAME
+
+Authentication:
+- Set up Azure OpenAI and Azure AI Search resources.
+- Use DefaultAzureCredential for authentication, ensure your environment is configured for it.
+
+Usage:
+    python aisearch_commands.py <command>
+Commands:
+    delete  - Delete all documents in the index 
+    count   - Count all documents in the index
+    search  - Search documents by specific properties
+    facet   - Search documents and get facets
+    vector  - Search documents using vector search
+    hybrid  - Search documents using hybrid search (text + vector)
+
+"""
 import argparse
-import os
 from openai import AzureOpenAI
 from azure.search.documents import SearchClient
-from app.settings import get_settings
-from collections import defaultdict
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
-
+from collections import defaultdict
+from app.settings import get_settings
 
 settings = get_settings()
 

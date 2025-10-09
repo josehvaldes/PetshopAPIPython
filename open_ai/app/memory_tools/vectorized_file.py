@@ -1,3 +1,4 @@
+"""Data structure for vectorized file representation."""
 from typing import TypedDict, List, Optional, Dict, Any
 
 class VectorizedFile(TypedDict):

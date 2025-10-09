@@ -1,4 +1,5 @@
-
+#TODO to delete this file if not used later
+"""Milvus vector database integration tool."""
 milvus_tool = {
     "name": "milvus_search",
     "description": "Searches documents by semantic similarity",

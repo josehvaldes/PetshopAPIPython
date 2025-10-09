@@ -12,6 +12,7 @@ dependencies:
     - azure-identity
     - azure-ai-agents
     - azure-search-documents
+    - azure-data-tables
     - semantic-text-splitter
     - tokenizers
     - pydantic_settings

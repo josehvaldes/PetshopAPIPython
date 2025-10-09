@@ -1,3 +1,12 @@
+""" 
+Utilities for estimating token counts, vector storage, and splitting text for AI Search indexing.
+Prerequisites:
+- Azure OpenAI resource with embedding model deployment
+- Azure AI Search resource with vector index
+- Python packages: langchain, tiktoken, tokenizers, semantic_text_splitter
+- Configuration in app/settings.py for Azure resources
+
+"""
 import math
 from app.memory_tools.file_parser import get_files_as_dict
 from app.memory_tools.vectorized_file import VectorizedFile

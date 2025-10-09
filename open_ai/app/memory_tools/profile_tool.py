@@ -1,4 +1,5 @@
-
+#TODO to delete this file if not used later
+"""Milvus vector database integration tool."""
 
 
 user_profile_tool = {
