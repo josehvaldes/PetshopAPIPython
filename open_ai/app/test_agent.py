@@ -17,7 +17,8 @@ from azure.ai.projects import AIProjectClient
 from azure.identity import DefaultAzureCredential
 from azure.ai.agents.models import AzureAISearchQueryType, AzureAISearchTool, ListSortOrder, MessageRole
 from azure.ai.projects.models import ConnectionType
-
+from azure.ai.agents.models import FunctionTool,Tool, ToolSet
+from app.memory_tools.user_functions import user_functions
 settings = get_settings()
 
 
@@ -38,16 +39,28 @@ with AIProjectClient(
         index_name=settings.azure_ai_search_index_name,
         query_type=AzureAISearchQueryType.SIMPLE,
         top_k=5,
-
     )
 
+    functions = FunctionTool(user_functions)
+
+    print("Setting up tools for the agent...")    
+    toolset = ToolSet()
+    toolset.add(functions)
+    toolset.add(ai_search)
+
     agents_client = project_client.agents
+    
+    agents_client.enable_auto_function_calls(toolset)
+
     agent = agents_client.create_agent(
         model= "gpt-4o-mini", #os.environ["MODEL_DEPLOYMENT_NAME"],
         name="mini-agent-gpt4o",
-        instructions="You are a helpful agent",
-        tools=ai_search.definitions,
-        tool_resources=ai_search.resources,
+        instructions="You are a helpful agent that use the Azure AI Search tool to answer questions about dogs." \
+        " If a user_name is provided, use the get_user_info function to get user details for a better answer.",
+        toolset=toolset,
+        # for ai_search only:
+        # tools=ai_search.definitions,
+        # tool_resources=ai_search.resources,        
     )
 
     print(f"Created agent, ID: {agent.id}")
@@ -58,7 +71,8 @@ with AIProjectClient(
     message = agents_client.messages.create(
         thread_id=thread.id,
         role="user",
-        content="which dogs are good for search and rescue? Give top 3 breeds and cite your sources. Use the Azure AI Search tool to find the information.",
+        #content="which dogs are good for search and rescue? Give top 3 breeds and cite your sources. Use the Azure AI Search tool to find the information.",
+        content="which dog breeds are recommended for user_name='yuna_syushin'? Cite your sources.",  
     )
     print(f"Created message, ID: {message.id}")
 

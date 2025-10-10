@@ -78,6 +78,9 @@ class AppSettings(BaseModel):
     azure_storage_table_service_url: str = Field(default="")
     azure_storage_table_name: str = Field(default="")
 
+    azure_storage_blob_service_url: str = Field(default="")
+    azure_storage_blob_container_name: str = Field(default="")
+
     # Derived / computed values
     @property
     def database_url(self) -> str:
@@ -145,6 +148,8 @@ def get_settings() -> AppSettings:
         flat.update({
             "azure_storage_table_service_url": raw["azure_storage_account"].get("table_service_url"),
             "azure_storage_table_name": raw["azure_storage_account"].get("table_name"),
+            "azure_storage_blob_service_url": raw["azure_storage_account"].get("blob_service_url"),
+            "azure_storage_blob_container_name": raw["azure_storage_account"].get("blob_container_name"),
         })
 
     return AppSettings(**{k: v for k, v in flat.items() if v is not None})
