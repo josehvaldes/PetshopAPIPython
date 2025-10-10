@@ -1,0 +1,45 @@
+{
+  "@odata.etag": "\"0x8DE0836A43E32C8\"",
+  "name": "dogs-breeds-text-skillset",
+  "description": "",
+  "skills": [
+    {
+      "@odata.type": "#Microsoft.Skills.Text.KeyPhraseExtractionSkill",
+      "name": "extract-keyphrases",
+      "description": "",
+      "context": "/document",
+      "defaultLanguageCode": "en",
+      "inputs": [
+        {
+          "name": "text",
+          "source": "/document/input",
+          "inputs": []
+        }
+      ],
+      "outputs": [
+        {
+          "name": "keyPhrases",
+          "targetName": "keyphrases"
+        }
+      ]
+    },
+    {
+      "@odata.type": "#Microsoft.Skills.Util.ShaperSkill",
+      "name": "extract-file-name-skill",
+      "description": "extract filename",
+      "context": "/document",
+      "inputs": [
+        {
+          "name": "metadata_name",
+          "source": "/document/metadata_storage_name"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "targetName": "file_name"
+        }
+      ]
+    }
+  ]
+}

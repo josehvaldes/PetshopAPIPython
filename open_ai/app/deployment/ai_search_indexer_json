@@ -1,0 +1,29 @@
+{
+  "name": "raw-indexer",
+  "description": "Dogs breeds indexer",
+  "dataSourceName": "petshop-raw-blob-datasource",
+  "skillsetName": "dogs-breeds-text-skillset",
+  "targetIndexName": "dogs-breed-index-raw",
+  "parameters": {
+    "configuration": {
+      "parsingMode": "json"
+    }
+  },
+  "fieldMappings": [
+    {
+      "sourceFieldName": "input",
+      "targetFieldName": "content"
+    }
+  ],
+  "outputFieldMappings": [
+    {
+      "sourceFieldName": "/document/keyphrases",
+      "targetFieldName": "keyphrases"
+    },
+    {
+      "sourceFieldName": "/document/file_name",
+      "targetFieldName": "file_name",
+      "mappingFunction": null
+    }
+  ]
+}

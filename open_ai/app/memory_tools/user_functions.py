@@ -1,10 +1,14 @@
+"""
+User-defined functions for the agent to call.
+Requirements:
+    pip install azure-storage-blob
 
+Functions:
+    - get_user_info(user_name: str) -> str    
+"""
 from azure.identity import DefaultAzureCredential
-from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
-
-from typing import Any, Callable, Set, Dict, List, Optional
-
-
+from azure.storage.blob import BlobServiceClient, ContainerClient
+from typing import Any, Callable, Set
 
 def get_blob_container_client(container_name:str, blob_service_url:str) -> ContainerClient:
     """
